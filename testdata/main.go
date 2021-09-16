@@ -804,6 +804,51 @@ func NullValueTime() error {
 	return nil
 }
 
+// DecimalArray function performs inserting decimal array.
+func DecimalArray() error {
+	db, _ := sql.Open("go_ibm_db", con)
+	defer db.Close()
+	db.Exec("Drop table arr")
+	_, err := db.Exec("create table arr(var1 decimal(8,6))")
+	if err != nil {
+		return err
+	}
+	a := []float64{1.001000, -25.190000, 1.001000, 25.190000, 25.190001}
+	st, err := db.Prepare("Insert into arr values(?)")
+	defer st.Close()
+	if err != nil {
+		return err
+	}
+	for _, i := range a {
+		_, err = st.Exec(i)
+		if err != nil {
+			return err
+		}
+	}
+	rows, err := db.Query("select var1 from arr")
+	if err != nil {
+		return err
+	}
+	var r []float64
+	var r1 float64
+	for rows.Next() {
+		if err := rows.Scan(&r1); err != nil {
+			return err
+		}
+		r = append(r, r1)
+	}
+	if err := rows.Err(); err != nil {
+		return err
+	}
+
+	for i := range r {
+		if r[i] != a[i] {
+			return fmt.Errorf("Wrong data retrieved ")
+		}
+	}
+	return nil
+}
+
 //CreateDB create database
 func CreateDB() bool {
 	res, err := a.CreateDb("Goo", conDB)
