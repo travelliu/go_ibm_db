@@ -170,6 +170,9 @@ func (c *BaseColumn) Value(buf []byte) (driver.Value, error) {
 	case api.SQL_C_CHAR:
 		return buf, nil
 	case api.SQL_C_WCHAR:
+		if len(buf) == 0 {
+			return buf,nil
+		}
 		if p == nil {
 			return nil, nil
 		}
