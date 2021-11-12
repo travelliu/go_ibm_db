@@ -11,13 +11,13 @@ import (
 var con = "PROTOCOL=tcpip;HOSTNAME=localhost;PORT=50000;DATABASE=go;UID=uname;PWD=pwd"
 var conDB = "PROTOCOL=tcpip;HOSTNAME=localhost;PORT=50000;UID=uname;PWD=pwd"
 
-//Createconnection will return the db instance
+// Createconnection will return the db instance
 func Createconnection() (db *sql.DB) {
 	db, _ = sql.Open("go_ibm_db", con)
 	return db
 }
 
-//Createtable will create the tables
+// Createtable will create the tables
 func Createtable() error {
 	db, err := sql.Open("go_ibm_db", con)
 	db.Exec("DROP table rocket")
@@ -29,7 +29,7 @@ func Createtable() error {
 	return nil
 }
 
-//Insert will insert data in to the table
+// Insert will insert data in to the table
 func Insert() error {
 	db, err := sql.Open("go_ibm_db", con)
 	_, err = db.Exec("insert into rocket values(1)")
@@ -39,7 +39,7 @@ func Insert() error {
 	return nil
 }
 
-//Drop will drop the table
+// Drop will drop the table
 func Drop() error {
 	db, err := sql.Open("go_ibm_db", con)
 	_, err = db.Exec("drop table rocket1")
@@ -49,7 +49,7 @@ func Drop() error {
 	return nil
 }
 
-//Prepare will prepare the statement
+// Prepare will prepare the statement
 func Prepare() error {
 	db, _ := sql.Open("go_ibm_db", con)
 	_, err := db.Prepare("select * from rocket")
@@ -59,7 +59,7 @@ func Prepare() error {
 	return nil
 }
 
-//Query will execute the prepared statement
+// Query will execute the prepared statement
 func Query() error {
 	db, _ := sql.Open("go_ibm_db", con)
 	st, _ := db.Prepare("select * from rocket")
@@ -70,7 +70,7 @@ func Query() error {
 	return nil
 }
 
-//ExecDirect will execute the query without prepare
+// ExecDirect will execute the query without prepare
 func ExecDirect() error {
 	db, _ := sql.Open("go_ibm_db", con)
 	_, err := db.Query("select * from rocket")
@@ -80,7 +80,7 @@ func ExecDirect() error {
 	return nil
 }
 
-//Scan will Scan the data in the rows
+// Scan will Scan the data in the rows
 func Scan() error {
 	db, _ := sql.Open("go_ibm_db", con)
 	st, _ := db.Prepare("select * from rocket")
@@ -95,7 +95,7 @@ func Scan() error {
 	return nil
 }
 
-//Next will fetch the data from the result set
+// Next will fetch the data from the result set
 func Next() error {
 	db, _ := sql.Open("go_ibm_db", con)
 	st, _ := db.Prepare("select * from rocket")
@@ -110,7 +110,7 @@ func Next() error {
 	return nil
 }
 
-//Columns will return the names of the cols
+// Columns will return the names of the cols
 func Columns() error {
 	db, _ := sql.Open("go_ibm_db", con)
 	st, _ := db.Prepare("select * from rocket")
@@ -126,7 +126,7 @@ func Columns() error {
 	return nil
 }
 
-//Queryrow will return the frirst row it matches
+// Queryrow will return the frirst row it matches
 func Queryrow() error {
 	a := 1
 	var uname int
@@ -142,7 +142,7 @@ func Queryrow() error {
 	return nil
 }
 
-//Begin will start a transaction
+// Begin will start a transaction
 func Begin() error {
 	db, err := sql.Open("go_ibm_db", con)
 	_, err = db.Begin()
@@ -152,7 +152,7 @@ func Begin() error {
 	return nil
 }
 
-//Commit will commit the uncommited transactions
+// Commit will commit the uncommited transactions
 func Commit() error {
 	db, err := sql.Open("go_ibm_db", con)
 	bg, err := db.Begin()
@@ -165,7 +165,7 @@ func Commit() error {
 	return nil
 }
 
-//Close will close the active connection
+// Close will close the active connection
 func Close() error {
 	db, _ := sql.Open("go_ibm_db", con)
 	err := db.Close()
@@ -175,7 +175,7 @@ func Close() error {
 	return nil
 }
 
-//PoolOpen creates a pool and makes a connection.
+// PoolOpen creates a pool and makes a connection.
 func PoolOpen() int {
 	pool := a.Pconnect("PoolSize=50")
 	db := pool.Open(con)
@@ -185,7 +185,7 @@ func PoolOpen() int {
 	return 1
 }
 
-//StoredProcedure function tests OUT Parameter by calling get_dbsize_info.
+// StoredProcedure function tests OUT Parameter by calling get_dbsize_info.
 func StoredProcedure() error {
 	var (
 		snapTime   time.Time
@@ -193,14 +193,17 @@ func StoredProcedure() error {
 		dbcapacity int64
 	)
 	db, _ := sql.Open("go_ibm_db", con)
-	_, err := db.Exec("call sysproc.get_dbsize_info(?, ?, ?,0)", sql.Out{Dest: &snapTime}, sql.Out{Dest: &dbsize}, sql.Out{Dest: &dbcapacity})
+	_, err := db.Exec(
+		"call sysproc.get_dbsize_info(?, ?, ?,0)", sql.Out{Dest: &snapTime}, sql.Out{Dest: &dbsize},
+		sql.Out{Dest: &dbcapacity},
+	)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-//StoredProcedureInOut function tests OUT Parameter by calling get_dbsize_info.
+// StoredProcedureInOut function tests OUT Parameter by calling get_dbsize_info.
 func StoredProcedureInOut() error {
 	db, _ := sql.Open("go_ibm_db", con)
 	in1 := 10
@@ -211,7 +214,9 @@ func StoredProcedureInOut() error {
 		return err
 	}
 	st.Query()
-	_, err = db.Exec("CALL sp2(?,?,?,?)", in1, sql.Out{Dest: &inout1, In: true}, sql.Out{Dest: &out1}, sql.Out{Dest: &out2})
+	_, err = db.Exec(
+		"CALL sp2(?,?,?,?)", in1, sql.Out{Dest: &inout1, In: true}, sql.Out{Dest: &out1}, sql.Out{Dest: &out2},
+	)
 	if err != nil {
 		return err
 	}
@@ -221,7 +226,7 @@ func StoredProcedureInOut() error {
 	return nil
 }
 
-//IntArray function performs inserting int,int8,int16,int32,int64 datatypes.
+// IntArray function performs inserting int,int8,int16,int32,int64 datatypes.
 func IntArray() error {
 	db, _ := sql.Open("go_ibm_db", con)
 	defer db.Close()
@@ -268,7 +273,7 @@ func IntArray() error {
 	return nil
 }
 
-//StringArray function performs inserting string array.
+// StringArray function performs inserting string array.
 func StringArray() error {
 	db, _ := sql.Open("go_ibm_db", con)
 	defer db.Close()
@@ -292,7 +297,7 @@ func StringArray() error {
 	return nil
 }
 
-//BoolArray function performs inserting bool array.
+// BoolArray function performs inserting bool array.
 func BoolArray() error {
 	db, _ := sql.Open("go_ibm_db", con)
 	defer db.Close()
@@ -316,7 +321,7 @@ func BoolArray() error {
 	return nil
 }
 
-//FloatArray function performs inserting float32,float64 datatypes.
+// FloatArray function performs inserting float32,float64 datatypes.
 func FloatArray() error {
 	db, _ := sql.Open("go_ibm_db", con)
 	defer db.Close()
@@ -345,7 +350,7 @@ func FloatArray() error {
 	return nil
 }
 
-//CharArray function performs inserting float32,float64 datatypes.
+// CharArray function performs inserting float32,float64 datatypes.
 func CharArray() error {
 	db, _ := sql.Open("go_ibm_db", con)
 	defer db.Close()
@@ -369,7 +374,7 @@ func CharArray() error {
 	return nil
 }
 
-//TimeStampArray function performs inserting float32,float64 datatypes.
+// TimeStampArray function performs inserting float32,float64 datatypes.
 func TimeStampArray() error {
 	db, _ := sql.Open("go_ibm_db", con)
 	defer db.Close()
@@ -396,7 +401,7 @@ func TimeStampArray() error {
 	return nil
 }
 
-//NullValueCharacter function performs
+// NullValueCharacter function performs
 func NullValueCharacter() error {
 	var out1, out2 sql.NullString
 	var out3 sql.NullInt64
@@ -464,7 +469,7 @@ func NullValueCharacter() error {
 	return nil
 }
 
-//NullValueString function performs
+// NullValueString function performs
 func NullValueString() error {
 	var out1, out2 sql.NullString
 	var out3 sql.NullInt64
@@ -532,7 +537,7 @@ func NullValueString() error {
 	return nil
 }
 
-//NullValueInteger function performs
+// NullValueInteger function performs
 func NullValueInteger() error {
 	var out1, out2 sql.NullString
 	var out3 sql.NullInt64
@@ -600,7 +605,7 @@ func NullValueInteger() error {
 	return nil
 }
 
-//NullValueBool function performs
+// NullValueBool function performs
 func NullValueBool() error {
 	var out1, out2 sql.NullString
 	var out3 sql.NullInt64
@@ -668,7 +673,7 @@ func NullValueBool() error {
 	return nil
 }
 
-//NullValueFloat function performs
+// NullValueFloat function performs
 func NullValueFloat() error {
 	var out1, out2 sql.NullString
 	var out3 sql.NullInt64
@@ -736,7 +741,7 @@ func NullValueFloat() error {
 	return nil
 }
 
-//NullValueTime function performs
+// NullValueTime function performs
 func NullValueTime() error {
 	var out1, out2 sql.NullString
 	var out3 sql.NullInt64
@@ -849,7 +854,84 @@ func DecimalArray() error {
 	return nil
 }
 
-//CreateDB create database
+func VarGraphicEmptyString() error {
+	db, _ := sql.Open("go_ibm_db", con)
+	defer db.Close()
+	db.Exec("Drop table var_graphic")
+	_, err := db.Exec("create table var_graphic(var1 vargraphic(10))")
+	if err != nil {
+		return err
+	}
+	st, err := db.Prepare("Insert into var_graphic values(?)")
+	defer st.Close()
+	if err != nil {
+		return err
+	}
+	_, err = st.Exec("")
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	rows, err := db.Query("select var1 from var_graphic")
+	if err != nil {
+		return err
+	}
+	var r1 string
+	for rows.Next() {
+		if err := rows.Scan(&r1); err != nil {
+			return err
+		}
+	}
+	if err := rows.Err(); err != nil {
+		return err
+	}
+	if "" != r1 {
+		fmt.Println("Data is mismatched at VarGraphicEmptyString")
+		return fmt.Errorf("Wrong data retrieved")
+	}
+
+	return nil
+}
+func VarGraphicNull() error {
+	db, _ := sql.Open("go_ibm_db", con)
+	defer db.Close()
+	db.Exec("Drop table var_graphic_null")
+	_, err := db.Exec("create table var_graphic_null(var1 vargraphic(10))")
+	if err != nil {
+		return err
+	}
+	st, err := db.Prepare("Insert into var_graphic_null values(?)")
+	defer st.Close()
+	if err != nil {
+		return err
+	}
+	_, err = st.Exec(nil)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	rows, err := db.Query("select var1 from var_graphic_null")
+	if err != nil {
+		return err
+	}
+	var r1 *string
+	for rows.Next() {
+		if err := rows.Scan(&r1); err != nil {
+			return err
+		}
+	}
+	if err := rows.Err(); err != nil {
+		return err
+	}
+	if r1 != nil {
+		fmt.Println("Data is mismatched at VarGraphicEmptyString")
+		return fmt.Errorf("Wrong data retrieved")
+	}
+
+	return nil
+}
+
+// CreateDB create database
 func CreateDB() bool {
 	res, err := a.CreateDb("Goo", conDB)
 	if err != nil {
@@ -858,7 +940,7 @@ func CreateDB() bool {
 	return res
 }
 
-//DropDB will drop database
+// DropDB will drop database
 func DropDB() bool {
 	res, err := a.DropDb("Goo", conDB)
 	if err != nil {
@@ -1072,6 +1154,18 @@ func main() {
 
 	result29 := ExecDirect()
 	if result29 == nil {
+		fmt.Println("Pass")
+	} else {
+		fmt.Println("Fail")
+	}
+	result30 := VarGraphicEmptyString()
+	if result30 == nil {
+		fmt.Println("Pass")
+	} else {
+		fmt.Println("Fail")
+	}
+	result31 := VarGraphicNull()
+	if result31 == nil {
 		fmt.Println("Pass")
 	} else {
 		fmt.Println("Fail")
