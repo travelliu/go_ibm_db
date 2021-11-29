@@ -110,7 +110,7 @@ const (
 	SQL_IS_UINTEGER = -5
 	SQL_IS_INTEGER  = -6
 
-	//Connection pooling
+	// Connection pooling
 	SQL_ATTR_CONNECTION_POOLING = 201
 	SQL_ATTR_CP_MATCH           = 202
 	SQL_CP_OFF                  = 0
@@ -130,6 +130,7 @@ const (
 	SQL_DESC_NULLABLE           = 1008
 	SQL_NULLABLE                = 1
 	SQL_NO_NULLS                = 0
+	SQL_ATTR_CLIENT_CODEPAGE    = 3002
 )
 
 type (

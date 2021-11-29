@@ -6,10 +6,15 @@ package go_ibm_db
 
 import (
 	"database/sql/driver"
+	"fmt"
+	"os"
+	"strconv"
 	"unsafe"
 
 	"github.com/ibmdb/go_ibm_db/api"
 )
+
+const dbCodePage = "DB2CODEPAGE"
 
 type Conn struct {
 	h  api.SQLHDBC
@@ -25,14 +30,34 @@ func (d *Driver) Open(dsn string) (driver.Conn, error) {
 	h := api.SQLHDBC(out)
 	drv.Stats.updateHandleCount(api.SQL_HANDLE_DBC, 1)
 
+	code := os.Getenv(dbCodePage)
+	if code != "" {
+		c, err := strconv.Atoi(code)
+		if err != nil {
+			return nil, fmt.Errorf("%s %s error %s ", dbCodePage, code, err)
+		}
+		ret = api.SQLSetConnectAttr(
+			h, api.SQL_ATTR_CLIENT_CODEPAGE,
+			(api.SQLPOINTER)(uintptr(c)),
+			api.SQL_IS_UINTEGER,
+		)
+		if IsError(ret) {
+			defer releaseHandle(h)
+			return nil, NewError("SQLSetConnectAttr", h)
+		}
+	}
+
 	b := api.StringToUTF16(dsn)
-	ret = api.SQLDriverConnect(h, 0,
+	ret = api.SQLDriverConnect(
+		h, 0,
 		(*api.SQLWCHAR)(unsafe.Pointer(&b[0])), api.SQLSMALLINT(len(b)),
-		nil, 0, nil, api.SQL_DRIVER_NOPROMPT)
+		nil, 0, nil, api.SQL_DRIVER_NOPROMPT,
+	)
 	if IsError(ret) {
 		defer releaseHandle(h)
 		return nil, NewError("SQLDriverConnect", h)
 	}
+
 	return &Conn{h: h}, nil
 }
 
@@ -46,7 +71,7 @@ func (c *Conn) Close() error {
 	return releaseHandle(h)
 }
 
-//Query method executes the statement with out prepare if no args provided, and a driver.ErrSkip otherwise (handled by sql.go to execute usual preparedStmt)
+// Query method executes the statement with out prepare if no args provided, and a driver.ErrSkip otherwise (handled by sql.go to execute usual preparedStmt)
 func (c *Conn) Query(query string, args []driver.Value) (driver.Rows, error) {
 	if len(args) > 0 {
 		// Not implemented for queries with parameters
@@ -61,8 +86,10 @@ func (c *Conn) Query(query string, args []driver.Value) (driver.Rows, error) {
 	h := api.SQLHSTMT(out)
 	drv.Stats.updateHandleCount(api.SQL_HANDLE_STMT, 1)
 	b := api.StringToUTF16(query)
-	ret = api.SQLExecDirect(h,
-		(*api.SQLWCHAR)(unsafe.Pointer(&b[0])), api.SQL_NTS)
+	ret = api.SQLExecDirect(
+		h,
+		(*api.SQLWCHAR)(unsafe.Pointer(&b[0])), api.SQL_NTS,
+	)
 	if IsError(ret) {
 		defer releaseHandle(h)
 		return nil, NewError("SQLExecDirectW", h)
@@ -75,7 +102,8 @@ func (c *Conn) Query(query string, args []driver.Value) (driver.Rows, error) {
 	os = &ODBCStmt{
 		h:          h,
 		Parameters: ps,
-		usedByStmt: true}
+		usedByStmt: true,
+	}
 	err = os.BindColumns()
 	if err != nil {
 		return nil, err
