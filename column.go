@@ -4,6 +4,7 @@
 
 package go_ibm_db
 
+import "C"
 import (
 	"database/sql/driver"
 	"errors"
@@ -95,7 +96,7 @@ func NewColumn(h api.SQLHSTMT, idx int) (Column, error) {
 		var v api.SQL_TIME_STRUCT
 		return NewBindableColumn(b, api.SQL_C_TYPE_TIME, int(unsafe.Sizeof(v))), nil
 	case api.SQL_CHAR, api.SQL_VARCHAR, api.SQL_CLOB, api.SQL_DECFLOAT, api.SQL_DECIMAL:
-		return NewVariableWidthColumn(b, api.SQL_C_CHAR, size), nil
+		return NewVariableWidthColumn(b, api.SQL_C_WCHAR, size), nil
 	case api.SQL_WCHAR, api.SQL_WVARCHAR:
 		return NewVariableWidthColumn(b, api.SQL_C_WCHAR, size), nil
 	case api.SQL_BINARY, api.SQL_VARBINARY, api.SQL_BLOB:
