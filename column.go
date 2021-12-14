@@ -188,7 +188,14 @@ func (c *BaseColumn) Value(buf []byte) (driver.Value, error) {
 		if p == nil {
 			return nil, nil
 		}
-		s := (*[1 << 20]uint16)(p)[:len(buf)/2]
+		// s := (*[1 << 20]uint16)(p)[:len(buf)/2]
+		// slice bounds out of range [:1074777] with length 1048576
+		a := (*[1 << 20]uint16)(p)
+		l := len(buf) / 2 // 1074777
+		if l > len(a) {   // 1048576
+			l = len(a)
+		}
+		s := a[:l]
 		return utf16toutf8(s), nil
 	case api.SQL_C_DBCHAR:
 		if p == nil {
