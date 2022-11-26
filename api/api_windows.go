@@ -46,13 +46,12 @@ const (
 	SQL_DATETIME        = 9
 	SQL_DATE            = 9
 	SQL_TIME            = 10
-	SQL_TIMESTAMP       = 11
 	SQL_VARCHAR         = 12
-	SQL_BOOLEAN         = 16
 	SQL_TYPE_DATE       = 91
 	SQL_TYPE_TIME       = 92
 	SQL_TYPE_TIMESTAMP  = 93
 	SQL_NEED_DATA       = 99
+	SQL_TIMESTAMP       = 11
 	SQL_LONGVARCHAR     = -1
 	SQL_BINARY          = -2
 	SQL_VARBINARY       = -3
@@ -67,15 +66,16 @@ const (
 	SQL_SIGNED_OFFSET   = -20
 	SQL_UNSIGNED_OFFSET = -22
 	SQL_GRAPHIC         = -95
-	SQL_VARGRAPHIC      = -96
-	SQL_LONGVARGRAPHIC  = -97
 	SQL_BLOB            = -98
 	SQL_CLOB            = -99
 	SQL_DBCLOB          = -350
 	SQL_SS_XML          = -152
+	SQL_BOOLEAN         = 16
 	SQL_DECFLOAT        = -360
 	SQL_XML             = -370
-
+	SQL_VARGRAPHIC      = -96
+	SQL_LONGVARGRAPHIC  = -97
+	
 	SQL_C_CHAR           = SQL_CHAR
 	SQL_C_LONG           = SQL_INTEGER
 	SQL_C_SHORT          = SQL_SMALLINT
@@ -112,7 +112,7 @@ const (
 	SQL_IS_UINTEGER = -5
 	SQL_IS_INTEGER  = -6
 
-	// Connection pooling
+	//Connection pooling
 	SQL_ATTR_CONNECTION_POOLING = 201
 	SQL_ATTR_CP_MATCH           = 202
 	SQL_CP_OFF                  = 0

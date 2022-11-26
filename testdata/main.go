@@ -14,13 +14,13 @@ var ctx = context.Background()
 var con = "PROTOCOL=tcpip;HOSTNAME=localhost;PORT=50000;DATABASE=go;UID=uname;PWD=pwd"
 var conDB = "PROTOCOL=tcpip;HOSTNAME=localhost;PORT=50000;UID=uname;PWD=pwd"
 
-//Createconnection will return the db instance
+// Createconnection will return the db instance
 func Createconnection() (db *sql.DB) {
 	db, _ = sql.Open("go_ibm_db", con)
 	return db
 }
 
-//Createtable will create the tables
+// Createtable will create the tables
 func Createtable() error {
 	db, err := sql.Open("go_ibm_db", con)
 	db.Exec("DROP table rocket")
@@ -32,7 +32,7 @@ func Createtable() error {
 	return nil
 }
 
-//Createtable will create the tables
+// Createtable will create the tables
 func Createtable_ExecContext() error {
 	db, err := sql.Open("go_ibm_db", con)
 	db.ExecContext(ctx, "DROP table rocket2")
@@ -48,7 +48,7 @@ func Createtable_ExecContext() error {
 	return nil
 }
 
-//Insert will insert data in to the table
+// Insert will insert data in to the table
 func Insert() error {
 	db, err := sql.Open("go_ibm_db", con)
 	_, err = db.Exec("insert into rocket values(1)")
@@ -58,7 +58,7 @@ func Insert() error {
 	return nil
 }
 
-//Drop will drop the table
+// Drop will drop the table
 func Drop() error {
 	db, err := sql.Open("go_ibm_db", con)
 	_, err = db.Exec("drop table rocket1")
@@ -68,7 +68,7 @@ func Drop() error {
 	return nil
 }
 
-//Prepare will prepare the statement
+// Prepare will prepare the statement
 func Prepare() error {
 	db, _ := sql.Open("go_ibm_db", con)
 	_, err := db.Prepare("select * from rocket")
@@ -78,7 +78,7 @@ func Prepare() error {
 	return nil
 }
 
-//PrepareContext will prepare the statement
+// PrepareContext will prepare the statement
 func PrepareContext() error {
 	db, _ := sql.Open("go_ibm_db", con)
 	_, err := db.PrepareContext(ctx, "select * from rocket")
@@ -88,7 +88,7 @@ func PrepareContext() error {
 	return nil
 }
 
-//Query will execute the prepared statement
+// Query will execute the prepared statement
 func Query() error {
 	db, _ := sql.Open("go_ibm_db", con)
 	st, _ := db.Prepare("select * from rocket")
@@ -99,7 +99,7 @@ func Query() error {
 	return nil
 }
 
-//QueryContext will execute the prepared statement
+// QueryContext will execute the prepared statement
 func QueryContext() error {
 	db, _ := sql.Open("go_ibm_db", con)
 	st, _ := db.PrepareContext(ctx, "select * from rocket")
@@ -109,7 +109,8 @@ func QueryContext() error {
 	}
 	return nil
 }
-//ExecDirect will execute the query without prepare
+
+// ExecDirect will execute the query without prepare
 func ExecDirect() error {
 	db, _ := sql.Open("go_ibm_db", con)
 	_, err := db.Query("select * from rocket")
@@ -119,7 +120,7 @@ func ExecDirect() error {
 	return nil
 }
 
-//Scan will Scan the data in the rows
+// Scan will Scan the data in the rows
 func Scan() error {
 	db, _ := sql.Open("go_ibm_db", con)
 	st, _ := db.Prepare("select * from rocket")
@@ -134,7 +135,7 @@ func Scan() error {
 	return nil
 }
 
-//Next will fetch the data from the result set
+// Next will fetch the data from the result set
 func Next() error {
 	db, _ := sql.Open("go_ibm_db", con)
 	st, _ := db.Prepare("select * from rocket")
@@ -149,7 +150,7 @@ func Next() error {
 	return nil
 }
 
-//Columns will return the names of the cols
+// Columns will return the names of the cols
 func Columns() error {
 	db, _ := sql.Open("go_ibm_db", con)
 	st, _ := db.Prepare("select * from rocket")
@@ -165,7 +166,7 @@ func Columns() error {
 	return nil
 }
 
-//Queryrow will return the frirst row it matches
+// Queryrow will return the frirst row it matches
 func Queryrow() error {
 	a := 1
 	var uname int
@@ -181,7 +182,7 @@ func Queryrow() error {
 	return nil
 }
 
-//Begin will start a transaction
+// Begin will start a transaction
 func Begin() error {
 	db, err := sql.Open("go_ibm_db", con)
 	_, err = db.Begin()
@@ -191,7 +192,7 @@ func Begin() error {
 	return nil
 }
 
-//Commit will commit the uncommited transactions
+// Commit will commit the uncommited transactions
 func Commit() error {
 	db, err := sql.Open("go_ibm_db", con)
 	bg, err := db.Begin()
@@ -204,7 +205,7 @@ func Commit() error {
 	return nil
 }
 
-//Close will close the active connection
+// Close will close the active connection
 func Close() error {
 	db, _ := sql.Open("go_ibm_db", con)
 	err := db.Close()
@@ -214,7 +215,7 @@ func Close() error {
 	return nil
 }
 
-//PoolOpen creates a pool and makes a connection.
+// PoolOpen creates a pool and makes a connection.
 func PoolOpen() int {
 	pool := a.Pconnect("PoolSize=50")
 	db := pool.Open(con)
@@ -224,7 +225,7 @@ func PoolOpen() int {
 	return 1
 }
 
-//StoredProcedure function tests OUT Parameter by calling get_dbsize_info.
+// StoredProcedure function tests OUT Parameter by calling get_dbsize_info.
 func StoredProcedure() error {
 	var (
 		snapTime   time.Time
@@ -239,7 +240,7 @@ func StoredProcedure() error {
 	return nil
 }
 
-//StoredProcedureInOut function tests OUT Parameter by calling get_dbsize_info.
+// StoredProcedureInOut function tests OUT Parameter by calling get_dbsize_info.
 func StoredProcedureInOut() error {
 	db, _ := sql.Open("go_ibm_db", con)
 	in1 := 10
@@ -260,7 +261,7 @@ func StoredProcedureInOut() error {
 	return nil
 }
 
-//IntArray function performs inserting int,int8,int16,int32,int64 datatypes.
+// IntArray function performs inserting int,int8,int16,int32,int64 datatypes.
 func IntArray() error {
 	db, _ := sql.Open("go_ibm_db", con)
 	defer db.Close()
@@ -307,7 +308,7 @@ func IntArray() error {
 	return nil
 }
 
-//StringArray function performs inserting string array.
+// StringArray function performs inserting string array.
 func StringArray() error {
 	db, _ := sql.Open("go_ibm_db", con)
 	defer db.Close()
@@ -331,7 +332,7 @@ func StringArray() error {
 	return nil
 }
 
-//BoolArray function performs inserting bool array.
+// BoolArray function performs inserting bool array.
 func BoolArray() error {
 	db, _ := sql.Open("go_ibm_db", con)
 	defer db.Close()
@@ -355,7 +356,7 @@ func BoolArray() error {
 	return nil
 }
 
-//FloatArray function performs inserting float32,float64 datatypes.
+// FloatArray function performs inserting float32,float64 datatypes.
 func FloatArray() error {
 	db, _ := sql.Open("go_ibm_db", con)
 	defer db.Close()
@@ -384,7 +385,7 @@ func FloatArray() error {
 	return nil
 }
 
-//CharArray function performs inserting float32,float64 datatypes.
+// CharArray function performs inserting float32,float64 datatypes.
 func CharArray() error {
 	db, _ := sql.Open("go_ibm_db", con)
 	defer db.Close()
@@ -408,7 +409,7 @@ func CharArray() error {
 	return nil
 }
 
-//TimeStampArray function performs inserting float32,float64 datatypes.
+// TimeStampArray function performs inserting float32,float64 datatypes.
 func TimeStampArray() error {
 	db, _ := sql.Open("go_ibm_db", con)
 	defer db.Close()
@@ -435,7 +436,7 @@ func TimeStampArray() error {
 	return nil
 }
 
-//NullValueCharacter function performs
+// NullValueCharacter function performs
 func NullValueCharacter() error {
 	var out1, out2 sql.NullString
 	var out3 sql.NullInt64
@@ -503,7 +504,7 @@ func NullValueCharacter() error {
 	return nil
 }
 
-//NullValueString function performs
+// NullValueString function performs
 func NullValueString() error {
 	var out1, out2 sql.NullString
 	var out3 sql.NullInt64
@@ -571,7 +572,7 @@ func NullValueString() error {
 	return nil
 }
 
-//NullValueInteger function performs
+// NullValueInteger function performs
 func NullValueInteger() error {
 	var out1, out2 sql.NullString
 	var out3 sql.NullInt64
@@ -639,7 +640,7 @@ func NullValueInteger() error {
 	return nil
 }
 
-//NullValueBool function performs
+// NullValueBool function performs
 func NullValueBool() error {
 	var out1, out2 sql.NullString
 	var out3 sql.NullInt64
@@ -707,7 +708,7 @@ func NullValueBool() error {
 	return nil
 }
 
-//NullValueFloat function performs
+// NullValueFloat function performs
 func NullValueFloat() error {
 	var out1, out2 sql.NullString
 	var out3 sql.NullInt64
@@ -775,7 +776,7 @@ func NullValueFloat() error {
 	return nil
 }
 
-//NullValueTime function performs
+// NullValueTime function performs
 func NullValueTime() error {
 	var out1, out2 sql.NullString
 	var out3 sql.NullInt64
@@ -886,6 +887,119 @@ func DecimalArray() error {
 		}
 	}
 	return nil
+}
+
+// CreateDB create database
+func CreateDB() bool {
+	res, err := a.CreateDb("Goo", conDB)
+	if err != nil {
+		fmt.Println(err)
+		return false
+	}
+	return res
+}
+
+// DropDB will drop database
+func DropDB() bool {
+	res, err := a.DropDb("Goo", conDB)
+	if err != nil {
+		return false
+	}
+	return res
+}
+
+// Execute Query for Connection pool
+func ExecQuery(st *sql.Stmt) error {
+	res, err := st.Query()
+	if err != nil {
+		return err
+	}
+	defer res.Close()
+	for res.Next() {
+		var a string
+		err = res.Scan(&a)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// Connection pool
+func ConnectionPool() int {
+	var flag int
+	flag = 0
+	pool := a.Pconnect("PoolSize=5")
+
+	ret := pool.Init(5, con)
+	if ret != true {
+		return 0
+	}
+
+	for i := 0; i < 20; i++ {
+		db := pool.Open(con, "SetConnMaxLifetime=10")
+		if db != nil {
+			st, err := db.Prepare("select * from rocket")
+			if err != nil {
+				return 0
+			} else {
+				go func() {
+					err := ExecQuery(st)
+					if err != nil && flag == 0 {
+						flag = 1
+					}
+					db.Close()
+				}()
+			}
+		}
+	}
+	time.Sleep(10 * time.Second)
+	pool.Release()
+
+	if flag == 1 {
+		return 0
+	}
+	return 1
+}
+
+// Connection pool with Timeout
+func ConnectionPoolWithTimeout() int {
+	var flag int
+	flag = 0
+	pool := a.Pconnect("PoolSize=3")
+
+	pool.SetConnMaxLifetime(10)
+	ret := pool.Init(3, con)
+	if ret != true {
+		return 0
+	}
+
+	for i := 0; i < 20; i++ {
+		db := pool.Open(con, "SetConnMaxLifetime=10")
+		if db != nil {
+			st, err := db.Prepare("select * from rocket")
+			if err != nil {
+				return 0
+			} else {
+				go func() {
+					err := ExecQuery(st)
+					if err != nil && flag == 0 {
+						flag = 1
+					}
+					db.Close()
+				}()
+			}
+		}
+	}
+	time.Sleep(30 * time.Second)
+	pool.SetConnMaxLifetime(0)
+
+	pool.Release()
+
+	if flag == 1 {
+		return 0
+	}
+	return 1
 }
 
 func VarGraphicEmptyString() error {
@@ -1005,114 +1119,25 @@ func ClobLength1073741824() error {
 	return nil
 }
 
-// CreateDB create database
-func CreateDB() bool {
-	res, err := a.CreateDb("Goo", conDB)
+func IntervalTest() error {
+	db, _ := sql.Open("go_ibm_db", con)
+	defer db.Close()
+	
+	rows, err := db.Query("SELECT interval('-12 month') as interval_days FROM SYSIBM.SYSDUMMY1 s ")
 	if err != nil {
-		return false
+		return err
 	}
-	return res
-}
-
-//DropDB will drop database
-func DropDB() bool {
-	res, err := a.DropDb("Goo", conDB)
-	if err != nil {
-		return false
+	var r1 string
+	for rows.Next() {
+		if err := rows.Scan(&r1); err != nil {
+			return err
+		}
 	}
-	return res
-}
-//Execute Query for Connection pool
-func ExecQuery(st *sql.Stmt) error {
-        res, err := st.Query()
-        if err != nil {
-                return err
-        }
-        defer res.Close()
-        for res.Next() {
-                    var a string
-                    err = res.Scan(&a)
-                    if err != nil {
-                            return err
-                    }
-        }
-        return nil
-}
-//Connection pool
-func ConnectionPool() int {
-        var flag int
-        flag = 0
-        pool := a.Pconnect("PoolSize=5")
-
-        ret := pool.Init(5, con)
-        if ret != true {
-		return 0
-        }
-
-        for i:=0; i<20; i++ {
-                db := pool.Open(con, "SetConnMaxLifetime=10")
-                if db != nil {
-                        st, err := db.Prepare("select * from rocket")
-                        if err != nil {
-                                return 0
-                        } else {
-                                go func() {
-                                        err := ExecQuery(st)
-                                        if  err != nil && flag == 0{
-                                             flag = 1
-                                        }
-                                        db.Close()
-                                }()
-                        }
-                }
-        }
-        time.Sleep(10*time.Second)
-        pool.Release()
-
-        if flag == 1 {
-                return 0
-        }
-        return 1
-}
-
-//Connection pool with Timeout
-func ConnectionPoolWithTimeout() int {
-        var flag int
-        flag = 0
-        pool := a.Pconnect("PoolSize=3")
-
-	pool.SetConnMaxLifetime(10)
-        ret := pool.Init(3, con)
-        if ret != true {
-		return 0
-        }
-
-        for i:=0; i<20; i++ {
-                db := pool.Open(con, "SetConnMaxLifetime=10")
-                if db != nil {
-                        st, err := db.Prepare("select * from rocket")
-                        if err != nil {
-                                return 0
-                        } else {
-                                go func() {
-                                        err := ExecQuery(st)
-                                        if  err != nil && flag == 0{
-                                             flag = 1
-                                        }
-                                        db.Close()
-                                }()
-                        }
-                }
-        }
-        time.Sleep(30*time.Second)
-	pool.SetConnMaxLifetime(0)
-
-        pool.Release()
-
-        if flag == 1 {
-                return 0
-        }
-        return 1
+	if r1 != "-1200" {
+		fmt.Println("Data is mismatched at IntervalTest")
+		return fmt.Errorf("wrong data retrieved %s",r1)
+	}
+	return nil
 }
 
 func main() {
@@ -1347,16 +1372,16 @@ func main() {
 	}
 
 	result33 := ConnectionPool()
-        if result33 == 1 {
-                fmt.Println("Pass")
-        } else {
-                fmt.Println("Fail")
-        }
+	if result33 == 1 {
+		fmt.Println("Pass")
+	} else {
+		fmt.Println("Fail")
+	}
 
 	result34 := ConnectionPoolWithTimeout()
-        if result34 == 1 {
-                fmt.Println("Pass")
-        } else {
-                fmt.Println("Fail")
-        }
+	if result34 == 1 {
+		fmt.Println("Pass")
+	} else {
+		fmt.Println("Fail")
+	}
 }

@@ -86,10 +86,8 @@ func (c *Conn) Query(query string, args []driver.Value) (driver.Rows, error) {
 	h := api.SQLHSTMT(out)
 	drv.Stats.updateHandleCount(api.SQL_HANDLE_STMT, 1)
 	b := api.StringToUTF16(query)
-	ret = api.SQLExecDirect(
-		h,
-		(*api.SQLWCHAR)(unsafe.Pointer(&b[0])), api.SQL_NTS,
-	)
+	ret = api.SQLExecDirect(h,
+		(*api.SQLWCHAR)(unsafe.Pointer(&b[0])), api.SQL_NTS)
 	if IsError(ret) {
 		defer releaseHandle(h)
 		return nil, NewError("SQLExecDirectW", h)
@@ -102,8 +100,7 @@ func (c *Conn) Query(query string, args []driver.Value) (driver.Rows, error) {
 	os = &ODBCStmt{
 		h:          h,
 		Parameters: ps,
-		usedByStmt: true,
-	}
+		usedByStmt: true}
 	err = os.BindColumns()
 	if err != nil {
 		return nil, err
