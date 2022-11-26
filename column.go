@@ -7,6 +7,7 @@ package go_ibm_db
 import "C"
 import (
 	"database/sql/driver"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"reflect"
@@ -156,6 +157,7 @@ func (c *BaseColumn) TypeScan() reflect.Type {
 
 func (c *BaseColumn) Value(buf []byte) (driver.Value, error) {
 	var p unsafe.Pointer
+	fmt.Println(hex.EncodeToString(buf))
 	if len(buf) > 0 {
 		p = unsafe.Pointer(&buf[0])
 	}
@@ -256,7 +258,8 @@ func NewVariableWidthColumn(b *BaseColumn, ctype api.SQLSMALLINT, colWidth api.S
 		if b.SType == api.SQL_DECIMAL {
 			l = l + 4 // adding 4 as decimal has '.' which takes 1 byte
 		} else {
-			l++ // room for null-termination character
+			// for informix INTERVAL(-24) month TO month change l++ => l = l+ 1
+			l = l + 1 // room for null-termination character
 		}
 		l *= 2 // wchars take 2 bytes each
 		// 长度2G
@@ -267,7 +270,7 @@ func NewVariableWidthColumn(b *BaseColumn, ctype api.SQLSMALLINT, colWidth api.S
 		if b.SType == api.SQL_DECIMAL {
 			l = l + 4 // adding 4 as decimal has '.' which takes 1 byte
 		} else {
-			l++ // room for null-termination character
+			l = l + 1 // room for null-termination character
 		}
 	case api.SQL_C_BINARY:
 		// nothing to do
