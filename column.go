@@ -107,7 +107,9 @@ func NewColumn(h api.SQLHSTMT, idx int) (Column, error) {
 		return NewBindableColumn(b, api.SQL_C_TYPE_TIME, int(unsafe.Sizeof(v))), nil
 	case api.SQL_CHAR, api.SQL_VARCHAR, api.SQL_CLOB, api.SQL_DECFLOAT, api.SQL_DECIMAL:
 		return NewVariableWidthColumn(b, api.SQL_C_WCHAR, size), nil
-	case api.SQL_WCHAR, api.SQL_WVARCHAR:
+	case api.SQL_WCHAR, api.SQL_WVARCHAR, api.SQL_GRAPHIC, api.SQL_VARGRAPHIC:
+		return NewVariableWidthColumn(b, api.SQL_C_WCHAR, size), nil
+	case api.SQL_LONGVARCHAR, api.SQL_LONGVARGRAPHIC:
 		return NewVariableWidthColumn(b, api.SQL_C_WCHAR, size), nil
 	case api.SQL_WCHAR, api.SQL_WVARCHAR, api.SQL_GRAPHIC, api.SQL_VARGRAPHIC:
 		return NewVariableWidthColumn(b, api.SQL_C_WCHAR, size), nil
@@ -273,7 +275,11 @@ func NewVariableWidthColumn(b *BaseColumn, ctype api.SQLSMALLINT, colWidth api.S
 	switch ctype {
 	case api.SQL_C_WCHAR, api.SQL_C_DBCHAR:
 		if b.SType == api.SQL_DECIMAL {
+<<<<<<< HEAD
 			l = l + 4 // adding 4 as decimal has '.' which takes 1 byte
+=======
+			l = l + 3 // adding 2 as decimal has '.' which takes 1 byte
+>>>>>>> 6347e0a... fix: SQL_C_WCHAR SQL_DECIMAL Length issue
 		} else {
 			l++ // room for null-termination character
 		}
