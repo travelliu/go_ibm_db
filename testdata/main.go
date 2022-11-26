@@ -1,12 +1,12 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
-	"time"
-	"context"
-	"strings"
 	a "github.com/ibmdb/go_ibm_db"
+	"strings"
+	"time"
 )
 
 var ctx = context.Background()
@@ -888,7 +888,124 @@ func DecimalArray() error {
 	return nil
 }
 
-//CreateDB create database
+func VarGraphicEmptyString() error {
+	db, _ := sql.Open("go_ibm_db", con)
+	defer db.Close()
+	db.Exec("Drop table var_graphic")
+	_, err := db.Exec("create table var_graphic(var1 vargraphic(10))")
+	if err != nil {
+		return err
+	}
+	st, err := db.Prepare("Insert into var_graphic values(?)")
+	defer st.Close()
+	if err != nil {
+		return err
+	}
+	_, err = st.Exec("")
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	rows, err := db.Query("select var1 from var_graphic")
+	if err != nil {
+		return err
+	}
+	var r1 string
+	for rows.Next() {
+		if err := rows.Scan(&r1); err != nil {
+			return err
+		}
+	}
+	if err := rows.Err(); err != nil {
+		return err
+	}
+	if "" != r1 {
+		fmt.Println("Data is mismatched at VarGraphicEmptyString")
+		return fmt.Errorf("Wrong data retrieved")
+	}
+
+	return nil
+}
+
+func VarGraphicNull() error {
+	db, _ := sql.Open("go_ibm_db", con)
+	defer db.Close()
+	db.Exec("Drop table var_graphic_null")
+	_, err := db.Exec("create table var_graphic_null(var1 vargraphic(10))")
+	if err != nil {
+		return err
+	}
+	st, err := db.Prepare("Insert into var_graphic_null values(?)")
+	defer st.Close()
+	if err != nil {
+		return err
+	}
+	_, err = st.Exec(nil)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	rows, err := db.Query("select var1 from var_graphic_null")
+	if err != nil {
+		return err
+	}
+	var r1 *string
+	for rows.Next() {
+		if err := rows.Scan(&r1); err != nil {
+			return err
+		}
+	}
+	if err := rows.Err(); err != nil {
+		return err
+	}
+	if r1 != nil {
+		fmt.Println("Data is mismatched at VarGraphicEmptyString")
+		return fmt.Errorf("Wrong data retrieved")
+	}
+
+	return nil
+}
+
+func ClobLength1073741824() error {
+	db, _ := sql.Open("go_ibm_db", con)
+	defer db.Close()
+	db.Exec("Drop table clob_1073741824")
+	_, err := db.Exec("create table clob_1073741824(var1 CLOB(1073741824 OCTETS))")
+	if err != nil {
+		return err
+	}
+	st, err := db.Prepare("Insert into clob_1073741824 values(?)")
+	defer st.Close()
+	if err != nil {
+		return err
+	}
+	_, err = st.Exec("test01")
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	rows, err := db.Query("select var1 from clob_1073741824")
+	if err != nil {
+		return err
+	}
+	var r1 string
+	for rows.Next() {
+		if err := rows.Scan(&r1); err != nil {
+			return err
+		}
+	}
+	if err := rows.Err(); err != nil {
+		return err
+	}
+	if r1 != "test01" {
+		fmt.Println("Data is mismatched at VarGraphicEmptyString")
+		return fmt.Errorf("Wrong data retrieved")
+	}
+
+	return nil
+}
+
+// CreateDB create database
 func CreateDB() bool {
 	res, err := a.CreateDb("Goo", conDB)
 	if err != nil {
