@@ -21,8 +21,8 @@ type Stmt struct {
 	mu    sync.Mutex
 }
 
-func (c *Conn) Prepare(query string) (driver.Stmt, error) {
-	return c.PrepareContext(context.Background(), query)
+func (c *Conn) Prepare( query string) (driver.Stmt, error) {
+    return c.PrepareContext(context.Background(), query)
 }
 
 func (c *Conn) PrepareContext(ctx context.Context, query string) (driver.Stmt, error) {
@@ -31,11 +31,11 @@ func (c *Conn) PrepareContext(ctx context.Context, query string) (driver.Stmt, e
 		return nil, err
 	}
 
-	select {
-	default:
-	case <-ctx.Done():
-		return nil, ctx.Err()
-	}
+    select {
+    default:
+    case <-ctx.Done():
+         return nil, ctx.Err()
+    }
 
 	return &Stmt{c: c, os: os, query: query}, nil
 }
@@ -59,7 +59,7 @@ func (s *Stmt) Close() error {
 
 // Exec executes the the sql but does not return the rows
 func (s *Stmt) Exec(args []driver.Value) (driver.Result, error) {
-	return s.exec(context.Background(), args)
+    return s.exec(context.Background(), args)
 }
 
 // ExecContext implements driver.StmtExecContext interface
@@ -104,18 +104,18 @@ func (s *Stmt) exec(ctx context.Context, args []driver.Value) (driver.Result, er
 		}
 	}
 
-	select {
-	default:
-	case <-ctx.Done():
-		return nil, ctx.Err()
-	}
+    select {
+    default:
+    case <-ctx.Done():
+         return nil, ctx.Err()
+    }
 
 	return &Result{rowCount: sumRowCount}, nil
 }
 
 // Query function executes the sql and return rows if rows are present
 func (s *Stmt) Query(args []driver.Value) (driver.Rows, error) {
-	return s.query1(context.Background(), args)
+    return s.query1(context.Background(), args)
 }
 
 // QueryContext implements driver.StmtQueryContext interface
@@ -153,11 +153,11 @@ func (s *Stmt) query1(ctx context.Context, args []driver.Value) (driver.Rows, er
 	}
 	s.os.usedByRows = true // now both Stmt and Rows refer to it
 
-	select {
-	default:
-	case <-ctx.Done():
-		return nil, ctx.Err()
-	}
+    select {
+    default:
+    case <-ctx.Done():
+         return nil, ctx.Err()
+    }
 
 	return &Rows{os: s.os}, nil
 }

@@ -9,28 +9,27 @@ import (
 	"time"
 )
 
-// DBP struct type contains the timeout, dbinstance and connection string
+//DBP struct type contains the timeout, dbinstance and connection string
 type DBP struct {
 	sql.DB
 	con string
 	n   time.Duration
 }
 
-// Pool struct contais the about the pool like size, used and available connections
+//Pool struct contais the about the pool like size, used and available connections
 type Pool struct {
 	availablePool map[string][]*DBP
 	usedPool      map[string][]*DBP
 	poolSize      int
-	mu            sync.Mutex
+        mu            sync.Mutex
 }
 
 var b *Pool
 var connMaxLifetime, poolSize int
-
 const defaultMaxIdleConns = 2
 const defaultConnMaxLifetime = 60
 
-// Pconnect will return the pool instance
+//Pconnect will return the pool instance
 func Pconnect(poolSize string) *Pool {
 	var size int
 	count := len(poolSize)
@@ -57,11 +56,11 @@ func Pconnect(poolSize string) *Pool {
 	return p
 }
 
-// Psize sets the size of the pool idf value is passed
+//Psize sets the size of the pool idf value is passed
 var pSize int
 
-// Open will check for the connection in the pool
-// If not opens a new connection and stores in the pool
+//Open will check for the connection in the pool
+//If not opens a new connection and stores in the pool
 func (p *Pool) Open(connStr string, options ...string) *DBP {
 	var Time time.Duration
 	count := len(options)
@@ -120,7 +119,7 @@ func (p *Pool) Open(connStr string, options ...string) *DBP {
 			p.mu.Unlock()
 			return dbi
 		}
-	} else {
+        } else {
 		pSize = pSize + 1
 
 		for i := 0; i < connMaxLifetime; i++ {
@@ -141,7 +140,7 @@ func (p *Pool) Open(connStr string, options ...string) *DBP {
 						p.mu.Unlock()
 						return dbpo
 					} else {
-						dbpo := val[0]
+						dbpo :=  val[0]
 						return dbpo
 					}
 				}
@@ -153,10 +152,10 @@ func (p *Pool) Open(connStr string, options ...string) *DBP {
 	return nil
 }
 
-func (p *Pool) Init(numConn int, connStr string) bool {
+func (p *Pool) Init(numConn int, connStr string) bool{
 	var Time time.Duration
 
-	if connMaxLifetime <= 0 {
+	if  connMaxLifetime  <= 0 {
 		Time = time.Duration(defaultConnMaxLifetime) * time.Second
 	} else {
 		Time = time.Duration(connMaxLifetime) * time.Second
@@ -180,12 +179,12 @@ func (p *Pool) Init(numConn int, connStr string) bool {
 	return true
 }
 
-// Close will make the connection available for the next release
+//Close will make the connection available for the next release
 func (d *DBP) Close() {
 	pSize = pSize - 1
 	var pos int
 	i := -1
-	b.mu.Lock()
+        b.mu.Lock()
 	if valc, okc := b.usedPool[d.con]; okc {
 		if len(valc) > 1 {
 			for _, b := range valc {
@@ -209,16 +208,16 @@ func (d *DBP) Close() {
 	} else {
 		d.DB.Close()
 	}
-	b.mu.Unlock()
+         b.mu.Unlock()
 }
 
-// Timeout for closing the connection in pool
+//Timeout for closing the connection in pool
 func (d *DBP) Timeout() {
 	var pos int
 	i := -1
 	select {
 	case <-time.After(d.n):
-		b.mu.Lock()
+                b.mu.Lock()
 		if valt, okt := b.availablePool[d.con]; okt {
 			if len(valt) > 1 {
 				for _, b := range valt {
@@ -239,11 +238,11 @@ func (d *DBP) Timeout() {
 				delete(b.availablePool, d.con)
 			}
 		}
-		b.mu.Unlock()
+                b.mu.Unlock()
 	}
 }
 
-// Release will close all the connections in the pool
+//Release will close all the connections in the pool
 func (p *Pool) Release() {
 	if p.availablePool != nil {
 		for _, vala := range p.availablePool {
@@ -263,7 +262,7 @@ func (p *Pool) Release() {
 	}
 }
 
-// Set the connMaxLifetime
+//Set the connMaxLifetime
 func (p *Pool) SetConnMaxLifetime(num int) {
 	connMaxLifetime = num
 }

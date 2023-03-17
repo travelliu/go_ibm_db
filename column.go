@@ -4,7 +4,6 @@
 
 package go_ibm_db
 
-import "C"
 import (
 	"database/sql/driver"
 	"errors"
@@ -12,7 +11,7 @@ import (
 	"reflect"
 	"time"
 	"unsafe"
-	
+
 	"github.com/ibmdb/go_ibm_db/api"
 )
 

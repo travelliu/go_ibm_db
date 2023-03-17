@@ -289,7 +289,7 @@ func ExtractParameters(h api.SQLHSTMT) ([]Parameter, error) {
 	return ps, nil
 }
 
-// SqltoCtype function will convert the sql type to c type
+//SqltoCtype function will convert the sql type to c type
 func SqltoCtype(sqltype api.SQLSMALLINT) api.SQLSMALLINT {
 	switch sqltype {
 	case api.SQL_BIT:
