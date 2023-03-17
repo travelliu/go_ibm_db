@@ -7,13 +7,12 @@ package go_ibm_db
 import "C"
 import (
 	"database/sql/driver"
-	"encoding/hex"
 	"errors"
 	"fmt"
 	"reflect"
 	"time"
 	"unsafe"
-
+	
 	"github.com/ibmdb/go_ibm_db/api"
 )
 
@@ -97,13 +96,13 @@ func NewColumn(h api.SQLHSTMT, idx int) (Column, error) {
 		var v api.SQL_TIME_STRUCT
 		return NewBindableColumn(b, api.SQL_C_TYPE_TIME, int(unsafe.Sizeof(v))), nil
 	case api.SQL_CHAR, api.SQL_VARCHAR, api.SQL_CLOB, api.SQL_DECFLOAT, api.SQL_DECIMAL:
-		return NewVariableWidthColumn(b, api.SQL_C_WCHAR, size), nil
-	case api.SQL_WCHAR, api.SQL_WVARCHAR, api.SQL_GRAPHIC, api.SQL_VARGRAPHIC:
+		return NewVariableWidthColumn(b, api.SQL_C_CHAR, size), nil
+	case api.SQL_WCHAR, api.SQL_WVARCHAR:
 		return NewVariableWidthColumn(b, api.SQL_C_WCHAR, size), nil
 	case api.SQL_BINARY, api.SQL_VARBINARY, api.SQL_BLOB:
 		return NewVariableWidthColumn(b, api.SQL_C_BINARY, size), nil
-	case api.SQL_LONGVARCHAR, api.SQL_LONGVARGRAPHIC:
-		return NewVariableWidthColumn(b, api.SQL_C_WCHAR, size), nil
+	case api.SQL_LONGVARCHAR:
+		return NewVariableWidthColumn(b, api.SQL_C_CHAR, size), nil
 	case api.SQL_WLONGVARCHAR, api.SQL_SS_XML:
 		return NewVariableWidthColumn(b, api.SQL_C_WCHAR, size), nil
 	case api.SQL_LONGVARBINARY:
@@ -157,7 +156,6 @@ func (c *BaseColumn) TypeScan() reflect.Type {
 
 func (c *BaseColumn) Value(buf []byte) (driver.Value, error) {
 	var p unsafe.Pointer
-	fmt.Println(hex.EncodeToString(buf))
 	if len(buf) > 0 {
 		p = unsafe.Pointer(&buf[0])
 	}
