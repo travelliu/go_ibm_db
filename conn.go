@@ -6,11 +6,10 @@ package go_ibm_db
 
 import (
 	"database/sql/driver"
-	"fmt"
-	"os"
+	"regexp"
 	"strconv"
 	"unsafe"
-
+	
 	"github.com/ibmdb/go_ibm_db/api"
 )
 
@@ -19,6 +18,25 @@ const dbCodePage = "DB2CODEPAGE"
 type Conn struct {
 	h  api.SQLHDBC
 	tx *Tx
+}
+
+var regexpCodePage = regexp.MustCompile(`(?is)codepage=([^\s]+)`)
+
+func getCodePage(dsn string) int {
+	var code string
+	if regexpCodePage.MatchString(dsn) {
+		finds := regexpCodePage.FindStringSubmatch(dsn)
+		code = finds[1]
+	} 
+	
+	if code == "" {
+		return 0
+	}
+	c, err := strconv.Atoi(code)
+	if err != nil {
+		return 0
+	}
+	return c
 }
 
 func (d *Driver) Open(dsn string) (driver.Conn, error) {
@@ -30,15 +48,11 @@ func (d *Driver) Open(dsn string) (driver.Conn, error) {
 	h := api.SQLHDBC(out)
 	drv.Stats.updateHandleCount(api.SQL_HANDLE_DBC, 1)
 
-	code := os.Getenv(dbCodePage)
-	if code != "" {
-		c, err := strconv.Atoi(code)
-		if err != nil {
-			return nil, fmt.Errorf("%s %s error %s ", dbCodePage, code, err)
-		}
+	codePage := getCodePage(dsn)
+	if codePage > 0 {
 		ret = api.SQLSetConnectAttr(
 			h, api.SQL_ATTR_CLIENT_CODEPAGE,
-			(api.SQLPOINTER)(uintptr(c)),
+			(api.SQLPOINTER)(uintptr(codePage)),
 			api.SQL_IS_UINTEGER,
 		)
 		if IsError(ret) {
@@ -71,7 +85,7 @@ func (c *Conn) Close() error {
 	return releaseHandle(h)
 }
 
-//Query method executes the statement with out prepare if no args provided, and a driver.ErrSkip otherwise (handled by sql.go to execute usual preparedStmt)
+// Query method executes the statement with out prepare if no args provided, and a driver.ErrSkip otherwise (handled by sql.go to execute usual preparedStmt)
 func (c *Conn) Query(query string, args []driver.Value) (driver.Rows, error) {
 	if len(args) > 0 {
 		// Not implemented for queries with parameters
