@@ -78,6 +78,9 @@ func (p *Parameter) BindValue(h api.SQLHSTMT, idx int, v driver.Value) error {
 		} else {
 			sqltype = api.SQL_WCHAR
 		}
+		if sqltype == api.SQL_DECIMAL {
+			decimal = p.Decimal
+		}
 	case int64:
 		ctype = api.SQL_C_SBIGINT
 		p.Data = &d
@@ -273,7 +276,7 @@ func ExtractParameters(h api.SQLHSTMT) ([]Parameter, error) {
 		return nil, nil
 	}
 	ps := make([]Parameter, n)
-	//fetch param descriptions
+	// fetch param descriptions
 	for i := range ps {
 		p := &ps[i]
 		ret = api.SQLDescribeParam(h, api.SQLUSMALLINT(i+1),
@@ -289,7 +292,7 @@ func ExtractParameters(h api.SQLHSTMT) ([]Parameter, error) {
 	return ps, nil
 }
 
-//SqltoCtype function will convert the sql type to c type
+// SqltoCtype function will convert the sql type to c type
 func SqltoCtype(sqltype api.SQLSMALLINT) api.SQLSMALLINT {
 	switch sqltype {
 	case api.SQL_BIT:

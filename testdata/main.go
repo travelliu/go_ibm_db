@@ -3139,6 +3139,11 @@ func DecimalColumn() int {
 		return 0
 	}
 
+	_, err = db.Exec("INSERT into "+tableOne+"(col1) values(?)", "1.75")
+	if err != nil {
+		return 0
+	}
+
 	rows, err2 := db.Query("SELECT * from " + tableOne)
 	if err2 != nil {
 		return 0
@@ -3151,7 +3156,7 @@ func DecimalColumn() int {
 		if err != nil {
 			return 0
 		}
-		// fmt.Printf("%v \n", f)
+		fmt.Printf("%v \n", f)
 	}
 
 	db.Query("DROP table " + tableOne)
