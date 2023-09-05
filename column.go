@@ -5,6 +5,7 @@
 package go_ibm_db
 
 import (
+	"bytes"
 	"database/sql/driver"
 	"errors"
 	"fmt"
@@ -128,7 +129,7 @@ func (c *BaseColumn) Name() string {
 }
 
 func (c *BaseColumn) TypeScan() reflect.Type {
-	//TODO(Akhil):This will return the golang type of a variable
+	// TODO(Akhil):This will return the golang type of a variable
 	switch c.CType {
 	case api.SQL_C_BIT:
 		return reflect.TypeOf(false)
@@ -168,6 +169,9 @@ func (c *BaseColumn) Value(buf []byte) (driver.Value, error) {
 	case api.SQL_C_DOUBLE:
 		return *((*float64)(p)), nil
 	case api.SQL_C_CHAR:
+		if c.SType == api.SQL_DECIMAL {
+			return bytes.Replace(buf, []byte(","), []byte("."), 1), nil
+		}
 		return buf, nil
 	case api.SQL_C_WCHAR:
 		if len(buf) == 0 {
@@ -267,7 +271,8 @@ func NewVariableWidthColumn(b *BaseColumn, ctype api.SQLSMALLINT, colWidth api.S
 		if b.SType == api.SQL_DECIMAL {
 			l = l + 4 // adding 4 as decimal has '.' which takes 1 byte
 		} else {
-			l = l + 1 // room for null-termination character
+			l++    // room for null-termination character
+			l *= 2 // chars take 2 bytes each
 		}
 	case api.SQL_C_BINARY:
 		// nothing to do

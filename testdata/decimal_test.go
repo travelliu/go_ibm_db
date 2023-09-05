@@ -1,13 +1,12 @@
-// Copyright © 2021 Bin Liu <bin.liu@enmotech.com>
-
 package main
 
 import (
 	"testing"
 )
 
-func TestDecimalArray(t *testing.T) {
-	if DecimalArray() != nil {
-		t.Error("Error at DecimalArray")
+// Issue 116
+func TestDecimalColumn(t *testing.T) {
+	if DecimalColumn() != 1 {
+		t.Error("Error at DecimalColumn")
 	}
 }

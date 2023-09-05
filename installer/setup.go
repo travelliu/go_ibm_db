@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"bufio"
 )
 
 func downloadFile(filepath string, url string) error {
