@@ -12,11 +12,11 @@ import (
 
 var ctx = context.Background()
 
-var host = "<HOST>"
-var port = "<PORT>"
-var database = "<DATABASE>"
-var uid = "<UID>"
-var pwd = "<PWD>"
+var host = "127.0.0.1"
+var port = "50000"
+var database = "testdb"
+var uid = "db2inst1"
+var pwd = "db2inst1"
 
 var connStr = "PROTOCOL=tcpip;HOSTNAME=" + host + ";PORT=" + port + ";DATABASE=" + database + ";UID=" + uid + ";PWD=" + pwd
 
@@ -3422,9 +3422,108 @@ func ClobLength1073741824() error {
 		return err
 	}
 	if r1 != "test01" {
+		fmt.Println("Data is mismatched at CLOB")
+		return fmt.Errorf("Wrong data retrieved")
+	}
+
+	return nil
+}
+
+func VarGraphicEmptyString() error {
+	db, _ := sql.Open("go_ibm_db", connStr)
+	defer db.Close()
+	db.Exec("Drop table var_graphic")
+	_, err := db.Exec("create table var_graphic(var1 vargraphic(10))")
+	if err != nil {
+		return err
+	}
+	st, err := db.Prepare("Insert into var_graphic values(?)")
+	defer st.Close()
+	if err != nil {
+		return err
+	}
+	_, err = st.Exec("")
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	rows, err := db.Query("select var1 from var_graphic")
+	if err != nil {
+		return err
+	}
+	var r1 string
+	for rows.Next() {
+		if err := rows.Scan(&r1); err != nil {
+			return err
+		}
+	}
+	if err := rows.Err(); err != nil {
+		return err
+	}
+	if "" != r1 {
 		fmt.Println("Data is mismatched at VarGraphicEmptyString")
 		return fmt.Errorf("Wrong data retrieved")
 	}
 
+	return nil
+}
+
+func VarGraphicNull() error {
+	db, _ := sql.Open("go_ibm_db", connStr)
+	defer db.Close()
+	db.Exec("Drop table var_graphic_null")
+	_, err := db.Exec("create table var_graphic_null(var1 vargraphic(10))")
+	if err != nil {
+		return err
+	}
+	st, err := db.Prepare("Insert into var_graphic_null values(?)")
+	defer st.Close()
+	if err != nil {
+		return err
+	}
+	_, err = st.Exec(nil)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	rows, err := db.Query("select var1 from var_graphic_null")
+	if err != nil {
+		return err
+	}
+	var r1 *string
+	for rows.Next() {
+		if err := rows.Scan(&r1); err != nil {
+			return err
+		}
+	}
+	if err := rows.Err(); err != nil {
+		return err
+	}
+	if r1 != nil {
+		fmt.Println("Data is mismatched at VarGraphicEmptyString")
+		return fmt.Errorf("Wrong data retrieved")
+	}
+
+	return nil
+}
+
+func IntervalTest() error {
+	db, _ := sql.Open("go_ibm_db", connStr)
+	defer db.Close()
+
+	rows, err := db.Query("SELECT interval('-12 month') as interval_days FROM SYSIBM.SYSDUMMY1 s ")
+	if err != nil {
+		return err
+	}
+	var r1 string
+	for rows.Next() {
+		if err := rows.Scan(&r1); err != nil {
+			return err
+		}
+	}
+	if r1 != "-1200" {
+		fmt.Println("Data is mismatched at IntervalTest")
+		return fmt.Errorf("wrong data retrieved %s", r1)
+	}
 	return nil
 }

@@ -274,6 +274,10 @@ func NewVariableWidthColumn(b *BaseColumn, ctype api.SQLSMALLINT, colWidth api.S
 			l++    // room for null-termination character
 			l *= 2 // chars take 2 bytes each
 		}
+		// 长度2G
+		if l > 2147483648 {
+			l = 2147483648
+		}
 	case api.SQL_C_BINARY:
 		// nothing to do
 	default:
