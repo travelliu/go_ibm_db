@@ -80,6 +80,7 @@ func (p *Parameter) BindValue(h api.SQLHSTMT, idx int, v driver.Value) error {
 		}
 		if sqltype == api.SQL_DECIMAL {
 			decimal = p.Decimal
+			size = p.Size
 		}
 	case int64:
 		ctype = api.SQL_C_SBIGINT
